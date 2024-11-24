@@ -7,11 +7,29 @@ import {
   Html,
   Text,
 } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
 
 export default function Experience() {
   const laptop = useGLTF(
     'https://vazxmixjsiawhamofees.supabase.co/storage/v1/object/public/models/macbook/model.gltf'
   );
+  // Create a target vector to smoothly interpolate the camera position
+  const targetPosition = new THREE.Vector3();
+
+  useFrame((state) => {
+    // Set the target position based on pointer movement
+    targetPosition.set(
+      -state.pointer.x * 1.5, // Adjust multiplier for sensitivity
+      -state.pointer.y * 1.5,
+      8 // Distance from the object
+    );
+
+    // Interpolate the camera position towards the target
+    state.camera.position.lerp(targetPosition, 0.1);
+    state.camera.lookAt(1, 0, 0); // Ensure the camera always looks at the origin
+    state.camera.updateProjectionMatrix();
+  });
   return (
     <>
       <Environment preset="city" />
